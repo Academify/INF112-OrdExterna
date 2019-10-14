@@ -1,0 +1,4 @@
+muita,40
+muita,20
+,10
+pouca,7775

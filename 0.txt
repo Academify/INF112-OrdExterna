@@ -1,0 +1,3 @@
+muita,10
+muita,30
+pouca,20
