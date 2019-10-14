@@ -15,7 +15,6 @@ int main(int argc, char **argv){
 
     ifstream fin(fileIn);
     ofstream fout("fileOut");
-    
 
 
 

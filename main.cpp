@@ -71,73 +71,65 @@ void getColumn(int col, const char*linha, char*&palavra){
 
 
 
-int main(){
-    /*
-    int n=10;
+int main(int argc, char **argv){
     
-    char*teste=(char*)n;
-    //sprintf(teste,"oi %d",10);
-    cout<<teste;
-    return 0;
-    */
+    char *fileIn = argv[1];
+    int n = atoi(argv[2]);
+    const char *chave = argv[3];
+    const char *valor = argv[4];
+
+    
     // Váriaveis
-    string arquivo = "file.txt";
-    int n = 3; // Número de linhas suportada
-    const char *chave = "categoria";
-    const char *valor = "idade";
+    ifstream file(fileIn);
     string buffer;
-    ifstream file(arquivo.c_str());
-    const char *linha;
-    int tamLinha;
+
+    
+    char *linha;
 
     // Saber qual coluna está a chave e o valor
     getline(file,buffer);
-    linha = buffer.c_str();
-    tamLinha = strlen(linha);
 
-    // Saber número de linhas
+    linha = (char*)buffer.c_str(); // TRANSFORMA PRA CHAR
+
+    // Saber número de colunas
     int numCols = getCountColumns(linha);
 
     // Saber qual coluna está a chave e o valor
-    int colChave,colValor;
-    getColumsPositions(linha,numCols,chave,valor,colChave,colValor);
+    int posChave,posValor;
+    getColumsPositions(linha,numCols,chave,valor,posChave,posValor);
 
     // Separa em vários arquivos
-    char **linhas = new char*[n];
-    char **palavras = new char*[n];
-    int ordemLinhas[n];
-    int palavra[n];
-    int plinha = 0;
-    int nLinhasArquivo=-1;
+    int posLinha = 0;
+    int nLinhasArquivo=0;
     bool fimArquivo = false;
 
     char **chaveAux = new char*[n];
     char **valorAux = new char*[n];
 
     while(true){
-        nLinhasArquivo++;
         getline(file,buffer);
-        linhas[plinha] = (char*)buffer.c_str();
+        linha = (char*)buffer.c_str();
 
-        getColumn(colChave,linha,chaveAux[plinha]);
-        getColumn(colValor,linha,valorAux[plinha]);
+        getColumn(posChave,linha,chaveAux[posLinha]);
+        getColumn(posValor,linha,valorAux[posLinha]);
+        cout << posLinha << endl;
 
-        plinha++;
-        if(plinha==n || file.eof()){
-            cout<<"Salva no arquivo"<<endl;
+        if(posLinha==n-1 || file.eof()){
+            //cout<<"Salva no arquivo"<<endl;
             // Ordena linhas e salva ordenado num arquivo
-            for(int i=0;i<n;i++){
+            for(int i=0;i<posLinha+1;i++){
                 cout<<chaveAux[i]<<" "<<valorAux[i]<<endl;
             }
-            plinha=0;
-            
+            posLinha=-1;
         }
         if(file.eof()){
             break;
         }
+        nLinhasArquivo++;
+        posLinha++;
     }
 
-    cout<<nLinhasArquivo<<endl;
+    //cout<<nLinhasArquivo<<endl;
 
     // Intercalação
 
