@@ -1,8 +1,8 @@
-categoria,salario,idade,vontade,
-D,10,30,muita,
-B,20,29,pouca,
-C,30,33,muita,
-D,10,44,muita,
-A,7775,34,pouca,
-A,40,54,muita,
-B,50,43,muita,
+categoria,salario,idade,vontade
+Av,10,30,muita
+Bdwe,20,32,pouca
+Ccc,30,33,pouca
+D2r,10,23,muita
+Abb,5,34,pouca
+Asd,40,54,muita
+Bl,50,43,muita

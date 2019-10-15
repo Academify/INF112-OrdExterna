@@ -67,20 +67,28 @@ int main(int argc, char **argv)
 
     char **chaveAux = new char *[n];
     char **valorAux = new char *[n];
+    char* chavetmp;
+    char* valortmp;
     Elemento *elementos = new Elemento [n];
     char *nomeArquivo;
-    while (true)
+    int z=0;
+    while (true && z < 10000)
     {
+        z++;
         getline(file, buffer);
         linha = (char *)buffer.c_str();
 
 
         getColumn(posChave, linha, chaveAux[posLinha]);
         getColumn(posValor, linha, valorAux[posLinha]);
+        //cout<<chaveAux[posLinha];
         //cout << posLinha << endl;
+        
+        //continue;
         elementos[posLinha].chave = chaveAux[posLinha];
         elementos[posLinha].valor = atoi(valorAux[posLinha]);
 
+    
         if (posLinha == n - 1 || file.eof()){
             quickSort(elementos, n);
             //cout << "Aqui" << endl;
@@ -91,7 +99,14 @@ int main(int argc, char **argv)
             //cout << nLinhasArquivo/n << endl;
             //cout << nomeArquivo << endl;
             // Ordena linhas e salva ordenado num arquivo
-            gravarArquivo(nomeArquivo, elementos, n);
+            //gravarArquivo(nomeArquivo, elementos, n);
+            
+            ofstream fout(nomeArquivo);
+            for (int i = 0; i < posLinha+1; i++){
+                fout << elementos[i].chave << "," << elementos[i].valor << endl;
+                //cout << elementos[i].chave << "," << elementos[i].valor << endl;
+                fout.flush();
+            }
             for (int i = 0; i < posLinha + 1; i++){
                 //cout << elementos[i].chave << " " << elementos[i].valor << endl;
             }
@@ -190,9 +205,21 @@ void getColumsPositions(const char *linha, int numCols, const char *chave, const
 }
 
 void getColumn(int col, const char *linha, char *&palavra){
+    char *pch;
+    pch = strtok ((char*)linha,",");
+    int i=0;
+    while (pch != NULL)
+    {
+        if(i==col)
+            return;
+        pch = strtok (NULL, ",");
+        i++;
+    }
+    /*
     int inicio = -1;
     int fim = 0;
     const char *column;
+    
     for (int i = 0; i < col; i++)
     {
         while (linha[fim] != ',' && linha[fim] != '\0')
@@ -209,6 +236,8 @@ void getColumn(int col, const char *linha, char *&palavra){
     int tam = fim - inicio;
     palavra = new char[tam];
     strncpy(palavra, linha + inicio + 1, tam - 1);
+    cout<<palavra<<endl;
+    */
 }
 
 void gravarArquivo(char *nome, Elemento *&elementos, int n){

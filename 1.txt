@@ -1,4 +1,5 @@
-muita,40
-muita,20
-,10
-pouca,7775
+Abb,34
+Asd,54
+D2r,33
+
+,23
