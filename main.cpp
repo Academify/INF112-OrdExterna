@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     {
         getline(file, buffer);
         linha = (char *)buffer.c_str();
-
+        //cout<<linha<<endl;
 
         getColumn(posChave, linha, chaveAux);
         getColumn(posValor, linha, valorAux);
@@ -87,29 +87,45 @@ int main(int argc, char **argv)
         elementos[posLinha].chave = chaveAux;
         elementos[posLinha].valor = atoi(valorAux);
 
+        
 
         if (posLinha == n - 1 || file.eof()){
             //quickSort(elementos, n);
-            //cout << "Aqui" << endl;
-            int aux = 5 + log10(nLinhasArquivo+1/n);
-            nomeArquivo = new char[aux];
+            //cout << "Aqui" << endl;        
+            //int aux = 5 + log10(nLinhasArquivo+1/n);
+            //out<<aux;
+            nomeArquivo = new char[20];
             sprintf(nomeArquivo,"%d.txt",nLinhasArquivo/n);
             
             // Ordena linhas e salva ordenado num arquivo
             //gravarArquivo(nomeArquivo, elementos, posLinha+1);
             
             for (int i = 0; i < posLinha + 1; i++){
-               //cout << elementos[i].chave << " " << elementos[i].valor << endl;
+               cout << elementos[i].chave << ":" << elementos[i].valor << endl;
             }
 
             gravarArquivo2(elementos, posLinha+1, nomeArquivo);
-        
+            
             posLinha = -1;
             if(file.eof())
                 break;
         }
         nLinhasArquivo++;
         posLinha++;
+    }
+
+    int nDispositivos = nLinhasArquivo/n+1;
+    ifstream* dispositivos = new ifstream[nDispositivos];
+    bool* isEmpty = new bool[nDispositivos];
+
+    for(int i=0;i<nLinhasArquivo;i++){
+        
+        int maior = -10;
+        for(int j=0;j<nDispositivos;j++){
+            if(!isEmpty[j]){
+                
+            }
+        }
     }
 
     // Intercalação
@@ -210,13 +226,16 @@ void getColumn(int col, const char *linha, char *&palavra){
         inicio = fim;
         fim++;
     }
-    while (linha[fim] != ',' && linha[fim] != '\0')
+    while (linha[fim] != ',' && linha[fim] != '\0' && linha[fim]!='\n')
     {
         fim++;
     }
     int tam = fim - inicio;
-    palavra = new char[tam];
+    palavra = new char[tam+1];
+    //cout<<inicio+1<<" "<<tam-1<<" ";
     strncpy(palavra, linha + inicio + 1, tam - 1);
+    palavra[tam-1]='\0';
+    //cout<<palavra<<endl;
 }
 
 /* void gravarArquivo(char *nome, Elemento *&elementos, int n){
@@ -230,19 +249,11 @@ void getColumn(int col, const char *linha, char *&palavra){
 } */
 
 void gravarArquivo2( Elemento *&elementos, int n, const char *nome){
-    
-    for (int i = 0; i < n; i++){
     ofstream fout(nome);
-        // elementos[i].chave[1]='\0';
-        cout<<elementos[i].chave<<", ";
-        cout << elementos[i].valor<<endl;
-        fout << elementos[i].chave << endl;
-        //fout<<"Boi boi mini boi boi";
+    for (int i = 0; i < n; i++){
+        fout << elementos[i].chave << ","<< elementos[i].valor << endl;
         fout.flush();
-    fout.close();
     }
-    
-    //fout.open("OI.txt",ios::ate);
-    //cout << nome << endl;
+    fout.close();
 }
 
