@@ -28,7 +28,9 @@ void quickSort2(Elemento *&v, int beg, int end);
 
 void quickSort(Elemento *&v, int n);
 
-void gravarArquivo(char *nome, Elemento *&elementos, int n);
+//void gravarArquivo(char *nome, Elemento *&elementos, int n);
+
+void gravarArquivo2(Elemento *&elementos,  int n, const char *nome);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -65,55 +67,46 @@ int main(int argc, char **argv)
     int nLinhasArquivo = 0;
     bool fimArquivo = false;
 
-    char **chaveAux = new char *[n];
-    char **valorAux = new char *[n];
+    char *chaveAux;
+    char *valorAux;
     char* chavetmp;
     char* valortmp;
     Elemento *elementos = new Elemento [n];
     char *nomeArquivo;
-    int z=0;
-    while (true && z < 10000)
+    while (true)
     {
-        z++;
         getline(file, buffer);
         linha = (char *)buffer.c_str();
 
 
-        getColumn(posChave, linha, chaveAux[posLinha]);
-        getColumn(posValor, linha, valorAux[posLinha]);
-        //cout<<chaveAux[posLinha];
+        getColumn(posChave, linha, chaveAux);
+        getColumn(posValor, linha, valorAux);
         //cout << posLinha << endl;
         
         //continue;
-        elementos[posLinha].chave = chaveAux[posLinha];
-        elementos[posLinha].valor = atoi(valorAux[posLinha]);
+        elementos[posLinha].chave = chaveAux;
+        elementos[posLinha].valor = atoi(valorAux);
 
-    
+
         if (posLinha == n - 1 || file.eof()){
-            quickSort(elementos, n);
+            //quickSort(elementos, n);
             //cout << "Aqui" << endl;
             int aux = 5 + log10(nLinhasArquivo+1/n);
             nomeArquivo = new char[aux];
             sprintf(nomeArquivo,"%d.txt",nLinhasArquivo/n);
-
-            //cout << nLinhasArquivo/n << endl;
-            //cout << nomeArquivo << endl;
-            // Ordena linhas e salva ordenado num arquivo
-            //gravarArquivo(nomeArquivo, elementos, n);
             
-            ofstream fout(nomeArquivo);
-            for (int i = 0; i < posLinha+1; i++){
-                fout << elementos[i].chave << "," << elementos[i].valor << endl;
-                //cout << elementos[i].chave << "," << elementos[i].valor << endl;
-                fout.flush();
-            }
+            // Ordena linhas e salva ordenado num arquivo
+            //gravarArquivo(nomeArquivo, elementos, posLinha+1);
+            
             for (int i = 0; i < posLinha + 1; i++){
-                //cout << elementos[i].chave << " " << elementos[i].valor << endl;
+               //cout << elementos[i].chave << " " << elementos[i].valor << endl;
             }
+
+            gravarArquivo2(elementos, posLinha+1, nomeArquivo);
+        
             posLinha = -1;
-        }
-        if (file.eof()){
-            break;
+            if(file.eof())
+                break;
         }
         nLinhasArquivo++;
         posLinha++;
@@ -205,21 +198,9 @@ void getColumsPositions(const char *linha, int numCols, const char *chave, const
 }
 
 void getColumn(int col, const char *linha, char *&palavra){
-    char *pch;
-    pch = strtok ((char*)linha,",");
-    int i=0;
-    while (pch != NULL)
-    {
-        if(i==col)
-            return;
-        pch = strtok (NULL, ",");
-        i++;
-    }
-    /*
     int inicio = -1;
     int fim = 0;
     const char *column;
-    
     for (int i = 0; i < col; i++)
     {
         while (linha[fim] != ',' && linha[fim] != '\0')
@@ -236,17 +217,32 @@ void getColumn(int col, const char *linha, char *&palavra){
     int tam = fim - inicio;
     palavra = new char[tam];
     strncpy(palavra, linha + inicio + 1, tam - 1);
-    cout<<palavra<<endl;
-    */
 }
 
-void gravarArquivo(char *nome, Elemento *&elementos, int n){
-    cout << nome << endl;
+/* void gravarArquivo(char *nome, Elemento *&elementos, int n){
+    //cout<<n<<endl;
     ofstream fout(nome);
     for (int i = 0; i < n; i++){
         fout << elementos[i].chave << "," << elementos[i].valor << endl;
-        cout << elementos[i].chave << "," << elementos[i].valor << endl;
+        //cout << elementos[i].chave << "," << elementos[i].valor << endl;
         fout.flush();
     }  
+} */
+
+void gravarArquivo2( Elemento *&elementos, int n, const char *nome){
+    
+    for (int i = 0; i < n; i++){
+    ofstream fout(nome);
+        // elementos[i].chave[1]='\0';
+        cout<<elementos[i].chave<<", ";
+        cout << elementos[i].valor<<endl;
+        fout << elementos[i].chave << endl;
+        //fout<<"Boi boi mini boi boi";
+        fout.flush();
+    fout.close();
+    }
+    
+    //fout.open("OI.txt",ios::ate);
+    //cout << nome << endl;
 }
 
