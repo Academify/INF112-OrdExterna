@@ -117,15 +117,32 @@ int main(int argc, char **argv)
     int nDispositivos = nLinhasArquivo/n+1;
     ifstream* dispositivos = new ifstream[nDispositivos];
     bool* isEmpty = new bool[nDispositivos];
-
-    for(int i=0;i<nLinhasArquivo;i++){
+    for(int i=0;i<nDispositivos;i++){
+        char *nome = new char[20];
+        sprintf(nome, "%d.txt", i);
+        dispositivos[i].open(nome);
+        isEmpty[i] = false;
+    }
         
-        int maior = -10;
+    for(int i=0;i<nLinhasArquivo;i++){
+        int posicaoMenor;
         for(int j=0;j<nDispositivos;j++){
             if(!isEmpty[j]){
-                
+                posicaoMenor = j;
+                break;
             }
         }
+        for (int  i = 0; i < nDispositivos; i++){
+            string buffer;
+
+            //ifstream temp = dispositivos[i];
+            
+            getline(dispositivos[i], buffer);
+            dispositivos[i] = *temp;
+            char * linha = (char*) buffer.c_str();
+            cout << linha << endl;
+        }
+        
     }
 
     // Intercalação

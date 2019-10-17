@@ -1,7 +1,7 @@
 categoria,salario,idade,vontade
 A,10,30,muita
-A,10,30,muita
-A,10,30,muita
+ç,10,30,muita
+i,10,30,muita
 A,10,30,muita
 A,10,30,muita
 A,10,30,muita
