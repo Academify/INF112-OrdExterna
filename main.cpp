@@ -90,9 +90,9 @@ int main(int argc, char **argv)
         
 
         if (posLinha == n - 1 || file.eof()){
-            //quickSort(elementos, n);
+            quickSort(elementos, n);
             //cout << "Aqui" << endl;        
-            //int aux = 5 + log10(nLinhasArquivo+1/n);
+            int aux = 5 + log10(nLinhasArquivo+1/n);
             //out<<aux;
             nomeArquivo = new char[20];
             sprintf(nomeArquivo,"%d.txt",nLinhasArquivo/n);
@@ -132,16 +132,17 @@ int main(int argc, char **argv)
                 break;
             }
         }
-        for (int  i = 0; i < nDispositivos; i++){
-            string buffer;
+        // for (int  i = 0; i < nDispositivos; i++){
+        //     string buffer;
 
-            //ifstream temp = dispositivos[i];
+        //     //ifstream temp = dispositivos[i];
             
-            getline(dispositivos[i], buffer);
-            dispositivos[i] = *temp;
-            char * linha = (char*) buffer.c_str();
-            cout << linha << endl;
-        }
+        //     getline(dispositivos[i], buffer);
+        //     dispositivos[i] = *temp;
+        //     char * linha = (char*) buffer.c_str();
+        //     cout << linha << endl;
+        // }
+       
         
     }
 
