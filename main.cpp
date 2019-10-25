@@ -34,6 +34,112 @@ void gravarArquivo2(Elemento *&elementos,  int n, const char *nome);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
 
+/*
+void ordena(int nDispositivos, int nLinhasArquivos, int n){
+    
+    ifstream *dispositivos = new ifstream[nDispositivos];
+    bool *semLinha = (bool*)calloc(nDispositivos,sizeof(bool));
+    Elemento* elementos = new Elemento[nDispositivos];
+    string buffer;
+    char*linha;
+    char*final;
+    char*numero;
+    char*nome = new char[20];
+    
+    ofstream resultado;
+    resultado.open("resultado.txt");
+
+    //Roda só uma vez
+    for(int i = 0; i < nDispositivos; i++){
+        sprintf(nome, "%d.txt", i);
+        dispositivos[i].open(nome);
+    }
+    
+    
+    for(int i=0;i<nDispositivos;i++){
+        getline(dispositivos[i],buffer);
+        linha = (char*)buffer.c_str();
+        elementos[i].chave = strtok_r(linha,",",&final);
+        elementos[i].valor = atoi(final);
+    
+    }
+    // Achar o primeiro não nulo
+    Elemento menor = elementos[0];
+    for(int i=1;i<nDispositivos;i++){
+        if(strcmp(elementos[i].chave,menor.chave)<0){
+            menor = elementos[i];
+        }
+    }
+    resultado << menor.chave << ',' << menor.valor << endl;
+    cout<<menor;
+
+
+
+}
+*/
+
+void ordena(int nDispositivos, int nLinhasArquivos, int n){
+    string buffer;
+    ifstream* dispositivos = new ifstream[nDispositivos];
+    Elemento* elementos = new Elemento[nDispositivos];
+    char*linha;
+    char*menor;
+    int pmenor;
+    bool *hasLine = new bool[nDispositivos];
+    // Abre os arquivos
+    for(int i=0;i<nDispositivos;i++){
+        hasLine[i]=true;
+        char *nome = new char[20];
+        sprintf(nome, "%d.txt", i);
+        dispositivos[i].open(nome);
+        
+        getline(dispositivos[i],buffer);
+        linha = (char *)buffer.c_str();
+        
+        getColumn(0, linha, elementos[i].chave);
+        char*valorTemp;
+        getColumn(1, linha, valorTemp);
+        elementos[i].valor = atoi(valorTemp);
+    }
+
+    // Acima ta tudo correto
+    for(int i=0;i<nLinhasArquivos;i++){
+
+        // Achar o menor não nulo
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]){
+                menor = elementos[j].chave;
+                pmenor = j;
+                break;
+            }
+        }
+        
+        // Achar o menor
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]){
+                if(strcmp(elementos[j].chave,menor)<0){
+                    menor = elementos[j].chave;
+                    pmenor = j;
+                }
+            }
+        }
+
+        cout<<elementos[pmenor].chave<<",";
+        cout<<elementos[pmenor].valor<<endl;
+
+        if(dispositivos[pmenor].peek()==-1){
+            hasLine[pmenor]=false;
+        }else{
+            getline(dispositivos[pmenor],buffer);
+            linha = (char *)buffer.c_str();
+            getColumn(0, linha, elementos[pmenor].chave);
+            char*valorTemp;
+            getColumn(1, linha, valorTemp);
+        }
+    }
+    
+
+}
 
 
 int main(int argc, char **argv)
@@ -52,7 +158,7 @@ int main(int argc, char **argv)
 
     // Saber qual coluna está a chave e o valor
     getline(file, buffer);
-
+    
     linha = (char *)buffer.c_str(); // TRANSFORMA PRA CHAR
 
     // Saber número de colunas
@@ -119,6 +225,8 @@ int main(int argc, char **argv)
         posLinha++;
     }
 
+    ordena(nLinhasArquivo/n+1,nLinhasArquivo,n);
+    return 0;
     // Intercalação
     int nDispositivos = nLinhasArquivo/n+1;
     ifstream* dispositivos = new ifstream[nDispositivos];
@@ -128,6 +236,7 @@ int main(int argc, char **argv)
     char *chaveTemp;
     char *valorTemp;
 
+    // Abre os arquivos temporarios
     for(int i=0;i<nDispositivos;i++){
         char *nome = new char[20];
         sprintf(nome, "%d.txt", i);
@@ -139,9 +248,10 @@ int main(int argc, char **argv)
         getColumn(1, linha, valorTemp);
         linhasElementos[i].chave=chaveTemp;
         linhasElementos[i].valor = atoi(valorTemp);
-        
     }
     
+    // Salva as linhas ordenadas em um arquivo
+    ofstream fout("ordenado.txt");
     for(int i=0;i<nLinhasArquivo+1;i++){
         int posicaoMenor;
         char*menor;
@@ -149,12 +259,10 @@ int main(int argc, char **argv)
         char*linha;
         // char *chave;
         // char *valor;
+
         // Supor o menor valor sendo o primeiro que encontrar
-        
         for(int j=0;j<nDispositivos;j++){
             if(!dispositivos[j].eof()){
-                cout << linhasElementos[j].chave;
-                cout << linhasElementos[j].valor<<endl;
                 posicaoMenor = j;
                 menor = new char[strlen(linhasElementos[j].chave)+1];
                 strcpy(menor, linhasElementos[j].chave);
@@ -175,41 +283,14 @@ int main(int argc, char **argv)
                 //cout << linhasElementos[k].valor<<endl;
             }
         }
-        /*
-        cout << menor;
-        cout << linhasElementos[posicaoMenor].valor << endl;
-         */
+        cout<<linhasElementos[posicaoMenor].chave<<endl;
+        
         getline(dispositivos[posicaoMenor], buffer);
         linha = (char *)buffer.c_str();
         getColumn(0, linha, chaveTemp);
         getColumn(1, linha, valorTemp);
         linhasElementos[posicaoMenor].chave = chaveTemp;
-        linhasElementos[posicaoMenor].valor = atoi(valorTemp);
-        /*
-        /*
-        
-        for(int i=0; i<nDispositivos; i++){
-            if (dispositivos[i].eof()){
-                getline()
-                getColumn(0, linha, chave);
-                getColumn(1, linha, valor);
-                dispositivos[i];
-
-            }
-        }
-         */
-        // for (int  i = 0; i < nDispositivos; i++){
-        //     string buffer;
-
-        //     //ifstream temp = dispositivos[i];
-            
-        //     getline(dispositivos[i], buffer);
-        //     dispositivos[i] = *temp;
-        //     char * linha = (char*) buffer.c_str();
-        //     cout << linha << endl;
-        // }
-       
-        
+        linhasElementos[posicaoMenor].valor = atoi(valorTemp); 
     }
     
         // Intercalação
@@ -334,10 +415,11 @@ void getColumn(int col, const char *linha, char *&palavra){
 
 void gravarArquivo2( Elemento *&elementos, int n, const char *nome){
     ofstream fout(nome);
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n-1; i++){
         fout << elementos[i].chave << ","<< elementos[i].valor << endl;
-        fout.flush();
     }
+    int i = n-1;
+    fout << elementos[i].chave << ","<< elementos[i].valor;
     fout.close();
 }
 
