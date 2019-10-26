@@ -162,7 +162,7 @@ void acharMenor(Elemento* &elementos,int n, int &posMenor, Elemento* &menor){
     }
 }
 
-void ordenacaoExterna(int nLinhasArquivos, int n){
+void ordenacaoExterna(int nLinhasArquivos, int n, ofsg){
     
     int nDispositivos = nLinhasArquivos/n+1;
     string buffer;
@@ -175,6 +175,7 @@ void ordenacaoExterna(int nLinhasArquivos, int n){
     char* maiorValor = new char[2];
     maiorValor[0]=(char)255;
     maiorValor[1]='\0';
+    
     // Abre os arquivos e copia para um vetor auxiliar a primeira linha de cada arquivo
     for(int i=0;i<nDispositivos;i++){
         // Abre os arquivos
@@ -189,11 +190,12 @@ void ordenacaoExterna(int nLinhasArquivos, int n){
         obterElemento(linha,0,1,elementos[i]);
     }
     
+    
     for(int i=0;i<nLinhasArquivos;i++){
         acharMenor(elementos,nDispositivos,posmenor,menor);
         cout<<menor->chave<<","<<menor->valor<<endl;
-        //free(menor->chave);
-        //free(menor->valor);
+        free(menor->chave);
+        free(menor->valor);
         getline(dispositivos[posmenor],buffer);
         linha = strdup(buffer.c_str());
         if(strlen(linha)==0){
@@ -202,15 +204,17 @@ void ordenacaoExterna(int nLinhasArquivos, int n){
         }else{            
             obterElemento(linha,0,1,*menor);
         }
-        //free(linha);
+        free(linha);
     }
     delete[]maiorValor;
     delete[]dispositivos;
     delete[]elementos;
+    
    
 }
 
 void calculaMedia(ifstream &ordenado){
+    
     long double soma=0.0;
     long double media;
     char *chave;
@@ -223,6 +227,7 @@ void calculaMedia(ifstream &ordenado){
     getline(ordenado, linha);
     linhaChar = (char*)linha.c_str();
     obterElemento(linhaChar, 0, 1, e);
+    
     chave = e.chave;
     soma = 0.0;
     soma += stold(e.valor);
@@ -231,8 +236,10 @@ void calculaMedia(ifstream &ordenado){
     // ---------------------------------------------------
     while(getline(ordenado, linha)){        
         linhaChar = (char*)linha.c_str();
+        free(e.chave);
+        free(e.valor);
         obterElemento(linhaChar, 0, 1, e);
-
+        
         if (strcmp(chave, e.chave)==0){
             soma +=stold(e.valor);
             chave = e.chave;
@@ -248,6 +255,8 @@ void calculaMedia(ifstream &ordenado){
     }
     media = soma/cont;
     cout << chave << "," << media << endl;
+    free(e.chave);
+    free(e.valor);
     
 //-----------------------------------------------------
 
@@ -263,12 +272,10 @@ int main(int argc, char **argv){
     const char *valor = argv[4];
     ifstream file(fileIn);
     ifstream ordenado("file.txt");
-    /*
     int posChave,posValor;
     saberQualColunaEstaChaveEValor(file,(char*)chave,(char*)valor,posChave,posValor);
     int nLinhas = ordenarESepararEmArquivos(file,n,posChave,posValor);
-    //ordenacaoExterna(nLinhas,n);
-    */
+    ordenacaoExterna(nLinhas,n);
     calculaMedia(ordenado);
     ordenado.close();
     file.close();
