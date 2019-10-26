@@ -3,9 +3,9 @@ A,50,43,muita
 Z,50,43,muita
 L,20,32,pouca
 C,10,30,muita
-A,10,23,muita
+J,190,244,muita
 L,5,34,pouca
-K,30,33,pouca
+K,405,300,pouca
 O,50,43,muita
 E,50,43,muita
 M,50,43,muita

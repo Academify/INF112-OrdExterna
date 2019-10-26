@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 
@@ -14,23 +15,27 @@ struct Elemento
 };
 
 // Saber qual coluna está a chave e o valor
-void saberQualColunaEstaChaveEValor(
-    ifstream &file, char *chave, char* valor,int &posChave, int &posValor
-)
-{
-    string buffer;
-    getline(file,buffer);
-    char *linha = (char*)buffer.c_str();
-    char *coluna = strtok(linha,",");
-    int cont = 0;
-    while (coluna!=NULL)
-    {
-        if(strcmp(coluna,chave)==0)  posChave = cont;
-        if(strcmp(coluna,valor)==0)  posValor = cont;
+void saberQualColunaEstaChaveEValor(ifstream &file, char *chave, char* valor,int &posChave, int &posValor){
+    
+    string buffer; // string auxiliar para ler a linha
+    getline(file,buffer); // Lê a linha e salva em buffer
+
+    char *linha = (char*)buffer.c_str(); //Converte a linha para char
+    char *coluna = strtok(linha,","); //Pica a linha unde tem vírgula
+    int cont = 0; // Contador auxiliar
+
+    while (coluna!=NULL){   // Enquanto existirem colunas
+
+        if(strcmp(coluna,chave)==0)  posChave = cont; // Pega a posição da chave na linha
+        if(strcmp(coluna,valor)==0)  posValor = cont; // Pega a posição do valor na linha
         coluna = strtok(NULL,",");
         cont++;
+
     }
+
 }
+
+// ----------------------------- Métodos de Ordenação ------------------------------------------------------------------
 int particiona(Elemento *&v, int beg, int end, int pivo){
     char *valorPivo = v[pivo].chave;
     //colocamos o pivo temporariamente na ultima posição
@@ -60,22 +65,8 @@ void quickSort2(Elemento *&v, int beg, int end){
 void quickSort(Elemento *&v, int n){
     quickSort2(v, 0, n);
 }
+// -----------------------------------------------------------------------------------------------------------------------
 
-void obterElemento2(char*linha,int posChave, int posValor, Elemento &elemento){
-    char *coluna = strtok(linha,",");
-    int maior = posChave>posValor?posChave:posValor;
-    for(int i=0;i<maior+1;i++){
-        if(i==posChave){
-            elemento.chave = strdup(coluna);
-        }
-        if(i==posValor){
-            elemento.valor = strdup(coluna);
-        }
-        coluna = strtok(NULL,",");
-    }
-    free(coluna);
-    free(linha);   
-}
 
 void obterElemento(char*&linha, int posChave, int posValor, Elemento &elemento){
     int maior = posChave>posValor?posChave:posValor;
@@ -103,6 +94,7 @@ int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
     char*chave;
     char*valor;
     int nLinhas=0;
+
     Elemento *elementos = new Elemento[n];
     int cont=0;
     
@@ -202,44 +194,49 @@ void ordenacaoExterna(int nLinhasArquivos, int n){
         }
     }
 
+}
+void calculaMedia(ifstream &ordenado){
+    long double soma =0.0;
+    long double media;
+    char *chave;
+    int cont =0;
+    string linha;
+    char *linhaChar;
+    Elemento e;
 
-    /*
+// - Pegando a chave do primeiro elemento ------
+    getline(ordenado, linha);
+    linhaChar = (char*)linha.c_str();
+    obterElemento(linhaChar, 0, 1, e);
+    chave = e.chave;
+    soma = 0.0;
+    soma += stold(e.valor);
+    chave = e.chave;
+    cont = 1;
+// ---------------------------------------------------
 
-    // Acima ta tudo correto
-    for(int i=0;i<nLinhasArquivos;i++){
-
-        // Achar o menor não nulo
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                menor = elementos[j].chave;
-                pmenor = j;
-                break;
-            }
+    while(getline(ordenado, linha)){
+        linhaChar = (char*)linha.c_str();
+        obterElemento(linhaChar, 0, 1, e);
+        if (strcmp(chave, e.chave)==0){
+            soma +=stold(e.valor);
+            chave = e.chave;
+            cont++;
+        }else{  
+            media = soma/cont;
+            cout << e.chave << ","<< media << endl;
+            soma = 0.0;
+            soma +=stold(e.valor);
+            chave = e.chave;
+            cont = 1;
         }
-        
-        // Achar o menor
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                if(strcmp(elementos[j].chave,menor)<0){
-                    menor = elementos[j].chave;
-                    pmenor = j;
-                }
-            }
-        }
-
-        cout<<elementos[pmenor].chave<<",";
-        cout<<elementos[pmenor].valor<<endl;
-
-        if(dispositivos[pmenor].peek()==-1){
-            hasLine[pmenor]=false;
-        }else{
-            getline(dispositivos[pmenor],buffer);
-            linha = (char *)buffer.c_str();
-            obterElemento(linha,0,1,elementos[i]);
-        }
-
+       
+        //cout << e.chave << ", " << media << endl;
     }
-    */
+    media = soma/cont;
+    cout << e.chave << "," << media << endl;
+//-----------------------------------------------------
+
 }
 
 // Salvar arquivos ordenados
@@ -250,10 +247,13 @@ int main(int argc, char **argv){
     const char *chave = argv[3];
     const char *valor = argv[4];
     ifstream file(fileIn);
+    /* ifstream ordenado("ordenado.txt");
     int posChave,posValor;
     saberQualColunaEstaChaveEValor(file,(char*)chave,(char*)valor,posChave,posValor);
     int nLinhas = ordenarESepararEmArquivos(file,n,posChave,posValor);
-    //ordenacaoExterna(nLinhas,n);
+    //ordenacaoExterna(nLinhas,n); */
+    ifstream um("1.txt");
+    calculaMedia(um);
     file.close();
     return 0;
 }

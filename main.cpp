@@ -201,7 +201,7 @@ int main(int argc, char **argv)
         if (posLinha == n - 1 || file.eof()){
             quickSort(elementos, n);
             //cout << "Aqui" << endl;        
-            int aux = 5 + log10(nLinhasArquivo+1/n);
+            //int aux = 5 + log10(nLinhasArquivo+1/n);
             //out<<aux;
             nomeArquivo = new char[20];
             sprintf(nomeArquivo,"%d.txt",nLinhasArquivo/n);
