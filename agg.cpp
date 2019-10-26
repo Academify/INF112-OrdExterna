@@ -114,19 +114,9 @@ int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
         obterElemento(linha,posChave,posValor,elementos[aux]);
         
         if(aux==n-1|| file.peek()==-1){
-
-            for(int i=0;i<aux+1;i++){
-                cout<<elementos[i].chave<<",";
-                cout<<elementos[i].valor<<endl;
-            }
-            cout<<endl;
             // Ordena vetor
             quickSort(elementos,aux);
-            for(int i=0;i<aux+1;i++){
-                cout<<elementos[i].chave<<",";
-                cout<<elementos[i].valor<<endl;
-            }
-            cout<<endl<<endl;
+            
             //
             char *nomeArquivo = new char[20];
             sprintf(nomeArquivo,"%d.txt",nLinhas/n);
@@ -152,94 +142,69 @@ int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
     return nLinhas;
 }
 
+void copiaElemento(Elemento &dest, Elemento &source){
+    dest.chave = source.chave;
+    dest.valor = source.valor;
+}
+
+void acharMenor(Elemento* &elementos,int n, int &posMenor, Elemento* &menor){
+    menor = &elementos[0];
+    for(int i=1;i<n;i++){
+        // cout<<elementos[i].chave<<" "<<menor->chave<<endl;
+        if(strcmp(elementos[i].chave,menor->chave)<0){
+            menor = &elementos[i];
+            posMenor = i;
+        }
+    }
+}
+
 void ordenacaoExterna(int nLinhasArquivos, int n){
+    
     int nDispositivos = nLinhasArquivos/n+1;
     string buffer;
+    
     ifstream* dispositivos = new ifstream[nDispositivos];
     Elemento* elementos = new Elemento[nDispositivos];
     char*linha;
-    char*menor=NULL;
-    int pmenor;
-    bool *hasLine = new bool[nDispositivos];
-    // Abre os arquivos
+    Elemento* menor;
+    int posmenor;
+    char* maiorValor = new char[2];
+    maiorValor[0]=(char)255;
+    maiorValor[1]='\0';
+    // Abre os arquivos e copia para um vetor auxiliar a primeira linha de cada arquivo
     for(int i=0;i<nDispositivos;i++){
-        hasLine[i]=true;
+        // Abre os arquivos
         char *nome = new char[20];
         sprintf(nome, "%d.txt", i);
         dispositivos[i].open(nome);
+        delete[]nome;
+
+        // 
         getline(dispositivos[i],buffer);
         linha = (char *)buffer.c_str();
         obterElemento(linha,0,1,elementos[i]);
-        if(menor==NULL){
-            menor = strdup(elementos[i].chave);
-            pmenor = i;
-        }
-        if(strcmp(elementos[i].chave,menor)<0){
-            menor = strdup(elementos[i].chave);
-            pmenor = i;
-        }
-        //cout<<elementos[i].chave<<" "<<elementos[i].valor<<endl;       
     }
+    
     for(int i=0;i<nLinhasArquivos;i++){
-        
-        if(hasLine){
-            getline(dispositivos[pmenor],buffer);
-            linha = (char *)buffer.c_str();
-            obterElemento(linha,0,1,elementos[pmenor]);
-            menor = strdup(elementos[i].chave);
-            if(dispositivos[pmenor].peek()==EOF){
-                hasLine[pmenor]=false;
-            }
+        acharMenor(elementos,nDispositivos,posmenor,menor);
+        cout<<menor->chave<<","<<menor->valor<<endl;
+        free(menor->chave);
+        free(menor->valor);
+        getline(dispositivos[posmenor],buffer);
+        linha = strdup(buffer.c_str());
+        if(strlen(linha)==0){
+            menor->chave = maiorValor;
+            menor->valor = maiorValor;
+        }else{            
+            obterElemento(linha,0,1,*menor);
         }
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                cout<<elementos[j].chave<<" "<<menor<<endl;
-                if(strcmp(elementos[j].chave,menor)<0){
-                    menor = strdup(elementos[j].chave);
-                    pmenor = j;
-                }
-            }
-        }
+        free(linha);
     }
-
-
-    /*
-
-    // Acima ta tudo correto
-    for(int i=0;i<nLinhasArquivos;i++){
-
-        // Achar o menor não nulo
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                menor = elementos[j].chave;
-                pmenor = j;
-                break;
-            }
-        }
-        
-        // Achar o menor
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                if(strcmp(elementos[j].chave,menor)<0){
-                    menor = elementos[j].chave;
-                    pmenor = j;
-                }
-            }
-        }
-
-        cout<<elementos[pmenor].chave<<",";
-        cout<<elementos[pmenor].valor<<endl;
-
-        if(dispositivos[pmenor].peek()==-1){
-            hasLine[pmenor]=false;
-        }else{
-            getline(dispositivos[pmenor],buffer);
-            linha = (char *)buffer.c_str();
-            obterElemento(linha,0,1,elementos[i]);
-        }
-
-    }
-    */
+    delete[]maiorValor;
+    
+    delete[]dispositivos;
+    delete[]elementos;
+   
 }
 
 // Salvar arquivos ordenados
@@ -253,7 +218,7 @@ int main(int argc, char **argv){
     int posChave,posValor;
     saberQualColunaEstaChaveEValor(file,(char*)chave,(char*)valor,posChave,posValor);
     int nLinhas = ordenarESepararEmArquivos(file,n,posChave,posValor);
-    //ordenacaoExterna(nLinhas,n);
+    ordenacaoExterna(nLinhas,n);
     file.close();
     return 0;
 }
