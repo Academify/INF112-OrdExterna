@@ -126,8 +126,7 @@ int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
             sprintf(nomeArquivo,"%d.txt",nLinhas/n);
             fout.open(nomeArquivo);
             for(int i=0;i<aux+1;i++){
-                fout<<elementos[i].chave<<",";
-                fout<<elementos[i].valor<<endl;
+                fout<<elementos[i].chave<<","<<elementos[i].valor<<endl;
                 free(elementos[i].chave);
                 free(elementos[i].valor);
             }
@@ -151,18 +150,7 @@ void copiaElemento(Elemento &dest, Elemento &source){
     dest.valor = source.valor;
 }
 
-void acharMenor(Elemento* &elementos,int n, int &posMenor, Elemento* &menor){
-    menor = &elementos[0];
-    for(int i=1;i<n;i++){
-        // cout<<elementos[i].chave<<" "<<menor->chave<<endl;
-        if(strcmp(elementos[i].chave,menor->chave)<0){
-            menor = &elementos[i];
-            posMenor = i;
-        }
-    }
-}
-
-void ordenacaoExterna(int nLinhasArquivos, int n, ofsg){
+void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
     
     int nDispositivos = nLinhasArquivos/n+1;
     string buffer;
@@ -175,7 +163,7 @@ void ordenacaoExterna(int nLinhasArquivos, int n, ofsg){
     char* maiorValor = new char[2];
     maiorValor[0]=(char)255;
     maiorValor[1]='\0';
-    
+    int *hasLine = new int[nDispositivos];
     // Abre os arquivos e copia para um vetor auxiliar a primeira linha de cada arquivo
     for(int i=0;i<nDispositivos;i++){
         // Abre os arquivos
@@ -184,33 +172,93 @@ void ordenacaoExterna(int nLinhasArquivos, int n, ofsg){
         dispositivos[i].open(nome);
         delete[]nome;
 
+        //
+        hasLine[i]=n;
         // 
         getline(dispositivos[i],buffer);
         linha = (char *)buffer.c_str();
         obterElemento(linha,0,1,elementos[i]);
+        //cout<<elementos[i].chave<<" "<<elementos[i].valor<<endl;
+    }
+    hasLine[nDispositivos-1]=nLinhasArquivos%n;
+    menor = &elementos[0];
+    posmenor = 0;
+
+    for(int i=0;i<nLinhasArquivos;i++){
+
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]>0){
+                menor = &elementos[j];
+                posmenor = j;
+            }
+        }
+
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]>0){
+                //cout<<j<<": "<<elementos[j].chave<<"<"<<menor->chave<<endl;
+                if(strcmp(elementos[j].chave,menor->chave)<0){
+                    menor = &elementos[j];
+                    posmenor=j;
+                    break;
+                }
+                /*
+                posmenor = j;
+                break;
+                */
+            }
+            menor = &elementos[posmenor];
+        }
+        
+        fout<<menor->chave<<","<<menor->valor<<endl;
+        hasLine[posmenor]--;
+        
+        getline(dispositivos[posmenor],buffer);
+        linha = (char *)buffer.c_str();
+        obterElemento(linha,0,1,elementos[posmenor]);
+        menor = &elementos[posmenor];
+        
     }
     
-    
-    for(int i=0;i<nLinhasArquivos;i++){
-        acharMenor(elementos,nDispositivos,posmenor,menor);
-        cout<<menor->chave<<","<<menor->valor<<endl;
-        free(menor->chave);
-        free(menor->valor);
+    /*
+    for(int i=0;true;i++){
+        // Acha o menor vetor que ainda tem linha
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]){
+                menor = &elementos[j];
+            }
+        }
+        // achar o menor elemento
+        for(int j=0;j<nDispositivos;j++){
+            if(hasLine[j]){
+                if(strcmp(elementos[j].chave,menor->chave)<0){
+                    menor = &elementos[j];
+                    posmenor = j;
+                    //cout<<elementos[j].chave<<" "<<menor->chave<<endl;
+                }
+            }
+        }
+
+        // Escreve-o na linha
+        fout<<menor->chave<<","<<menor->valor<<endl;
+
+        // Lê a próxima linha
         getline(dispositivos[posmenor],buffer);
         linha = strdup(buffer.c_str());
+        cout<<linha<<endl;
         if(strlen(linha)==0){
-            menor->chave = maiorValor;
-            menor->valor = maiorValor;
+            hasLine[posmenor] = false;
         }else{            
             obterElemento(linha,0,1,*menor);
         }
         free(linha);
+        
     }
+    */
+    
     delete[]maiorValor;
+    
     delete[]dispositivos;
     delete[]elementos;
-    
-   
 }
 
 void calculaMedia(ifstream &ordenado){
@@ -236,8 +284,6 @@ void calculaMedia(ifstream &ordenado){
     // ---------------------------------------------------
     while(getline(ordenado, linha)){        
         linhaChar = (char*)linha.c_str();
-        free(e.chave);
-        free(e.valor);
         obterElemento(linhaChar, 0, 1, e);
         
         if (strcmp(chave, e.chave)==0){
@@ -271,13 +317,15 @@ int main(int argc, char **argv){
     const char *chave = argv[3];
     const char *valor = argv[4];
     ifstream file(fileIn);
-    ifstream ordenado("file.txt");
+    ifstream ordenado("ordenado.txt");
+    ofstream fout("ordenado.txt");
     int posChave,posValor;
     saberQualColunaEstaChaveEValor(file,(char*)chave,(char*)valor,posChave,posValor);
     int nLinhas = ordenarESepararEmArquivos(file,n,posChave,posValor);
-    ordenacaoExterna(nLinhas,n);
+    ordenacaoExterna(fout,nLinhas,n);
     calculaMedia(ordenado);
     ordenado.close();
+    fout.close();
     file.close();
     return 0;
 }
