@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -293,7 +294,7 @@ void calculaMedia(ifstream &ordenado){
             cont++;
         }else{  
             media = soma/cont;
-            cout << chave << ","<< media << endl;
+            cout << fixed << chave << ", " << setprecision(15) << media << endl;
             soma = 0.0;
             soma +=stold(e.valor);
             chave = e.chave;
@@ -301,7 +302,7 @@ void calculaMedia(ifstream &ordenado){
         }
     }
     media = soma/cont;
-    cout << chave << "," << media << endl;
+    cout << fixed << chave << ", " << setprecision(15) << media << endl;
     free(e.chave);
     free(e.valor);
     
