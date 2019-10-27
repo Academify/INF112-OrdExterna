@@ -190,6 +190,7 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
             if(hasLine[j]>0){
                 menor = &elementos[j];
                 posmenor = j;
+                break;
             }
         }
 
