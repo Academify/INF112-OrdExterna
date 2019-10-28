@@ -8,24 +8,36 @@
 
 using namespace std;
 
-struct Elemento
-{
+// ---------------------------------------------------------------------------------------------------------------------------------------
+/* 
+    Este trabalho foi desenvolvido pelos alunos Gabriel Bezerra - 98891, Guilherme Dias - 95673 e Thiago Ferreira - 98893.
+
+    Como pedido, este trabalho lẽ, pela linha de comando do terminal, um arquivo para o qual se deseja fazer a média dos valores agrupados
+    por chave e imprime na tela os resultados. 
+
+    Os métodos de ordenação usados foram o quick sort para a ordenação dos valores dentro de pequenos arquivos e o mergeSort para ordenar 
+    todos os valores que irão para o arquivo final ordenado.
+
+    
+*/
+// ---------------------------------------------------------------------------------------------------------------------------------------
+
+struct Elemento{
     char *chave;
     char *valor;
 };
 
-// Saber qual coluna está a chave e o valor
+// Esta função tem o objetivo de descobrir em qual posição da linha obtida do arquivo estão chave e valor
 void saberQualColunaEstaChaveEValor(
-    ifstream &file, char *chave, char* valor,int &posChave, int &posValor
-)
-{
+    ifstream &file, char *chave, char* valor,int &posChave, int &posValor){
+
     string buffer;
     getline(file,buffer);
     char *linha = (char*)buffer.c_str();
     char *coluna = strtok(linha,",");
     int cont = 0;
-    while (coluna!=NULL)
-    {
+    while (coluna!=NULL){
+
         if(strcmp(coluna,chave)==0)  posChave = cont;
         if(strcmp(coluna,valor)==0)  posValor = cont;
         coluna = strtok(NULL,",");
@@ -33,32 +45,28 @@ void saberQualColunaEstaChaveEValor(
     }
 }
 
+// A função particiona é utilizada dentro dos métodos de ordenação de valores (QuickSort) 
+int particiona (Elemento elementos[], int menor, int maior){
+    char *pivo = elementos[maior].chave; 
+    int i = (menor - 1);
+    for (int j = menor; j <= maior - 1; j++){
 
-int partition (Elemento arr[], int low, int high)
-{
-    char *pivot = arr[high].chave;    //taking the last element as pivot
-    int i = (low - 1);
-    for (int j = low; j <= high- 1; j++)
-    {
-        // If current element is smaller than or
-        // equal to pivot
-        if (strcmp(arr[j].chave,pivot)<0)
-        {
+        if (strcmp(elementos[j].chave,pivo)<0){
             i++;
-            swap(arr[i], arr[j]);
+            swap(elementos[i], elementos[j]);
         }
     }
-    swap(arr[i + 1], arr[high]);
+    swap(elementos[i + 1], elementos[maior]);
     return (i + 1);
 }
 
-void quickSort2(Elemento arr[], int low, int high)
-{
-    if (low < high)
-    {
-        int pi = partition(arr, low, high);
-        quickSort2(arr, low, pi - 1);
-        quickSort2(arr, pi + 1, high);
+// -------------------------- QuickSort -----------------------------------------------------------------
+
+void quickSort2(Elemento elementos[], int menor, int maior){
+    if (menor < maior){
+        int pivo = particiona(elementos, menor, maior);
+        quickSort2(elementos, menor, pivo - 1);
+        quickSort2(elementos, pivo + 1, maior);
     }
 }
 
@@ -66,22 +74,9 @@ void quickSort(Elemento *&v, int n){
     quickSort2(v, 0, n);
 }
 
-void obterElemento2(char*linha,int posChave, int posValor, Elemento &elemento){
-    char *coluna = strtok(linha,",");
-    int maior = posChave>posValor?posChave:posValor;
-    for(int i=0;i<maior+1;i++){
-        if(i==posChave){
-            elemento.chave = strdup(coluna);
-        }
-        if(i==posValor){
-            elemento.valor = strdup(coluna);
-        }
-        coluna = strtok(NULL,",");
-    }
-    free(coluna);
-    free(linha);   
-}
+// ----------------------------------------------------------------------------------------------------
 
+// Essa função é usada para obter um elemento de uma linha retirada de um arquivo
 void obterElemento(char*&linha, int posChave, int posValor, Elemento &elemento){
     int maior = posChave>posValor?posChave:posValor;
     char* s = strdup(linha);
@@ -102,6 +97,7 @@ void obterElemento(char*&linha, int posChave, int posValor, Elemento &elemento){
 
 }
 
+// Essa função pega n linhas e as ordena, em seguida, cria um arquivo e as salva.
 int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
     string buffer;
     char*linha;
@@ -146,11 +142,13 @@ int ordenarESepararEmArquivos(ifstream &file,int n, int posChave, int posValor){
     return nLinhas;
 }
 
+// Essa função copia um elemento
 void copiaElemento(Elemento &dest, Elemento &source){
     dest.chave = source.chave;
     dest.valor = source.valor;
 }
 
+// Essa função faz a intercalação entre os arquivos ordenados (merge)
 void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
     
     int nDispositivos = nLinhasArquivos/n+1;
@@ -161,10 +159,9 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
     char*linha;
     Elemento* menor;
     int posmenor;
-    char* maiorValor = new char[2];
-    maiorValor[0]=(char)255;
-    maiorValor[1]='\0';
+
     int *hasLine = new int[nDispositivos];
+    
     // Abre os arquivos e copia para um vetor auxiliar a primeira linha de cada arquivo
     for(int i=0;i<nDispositivos;i++){
         // Abre os arquivos
@@ -173,13 +170,11 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
         dispositivos[i].open(nome);
         delete[]nome;
 
-        //
+
         hasLine[i]=n;
-        // 
         getline(dispositivos[i],buffer);
         linha = (char *)buffer.c_str();
         obterElemento(linha,0,1,elementos[i]);
-        //cout<<elementos[i].chave<<" "<<elementos[i].valor<<endl;
     }
     hasLine[nDispositivos-1]=nLinhasArquivos%n;
     menor = &elementos[0];
@@ -197,21 +192,18 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
 
         for(int j=0;j<nDispositivos;j++){
             if(hasLine[j]>0){
-                //cout<<j<<": "<<elementos[j].chave<<"<"<<menor->chave<<endl;
                 if(strcmp(elementos[j].chave,menor->chave)<0){
                     menor = &elementos[j];
                     posmenor=j;
                     break;
                 }
-                /*
-                posmenor = j;
-                break;
-                */
             }
             menor = &elementos[posmenor];
         }
         
         fout<<menor->chave<<","<<menor->valor<<endl;
+        free(menor->chave);
+        free(menor->valor);
         hasLine[posmenor]--;
         
         getline(dispositivos[posmenor],buffer);
@@ -220,49 +212,17 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
         menor = &elementos[posmenor];
         
     }
-    
-    /*
-    for(int i=0;true;i++){
-        // Acha o menor vetor que ainda tem linha
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                menor = &elementos[j];
-            }
-        }
-        // achar o menor elemento
-        for(int j=0;j<nDispositivos;j++){
-            if(hasLine[j]){
-                if(strcmp(elementos[j].chave,menor->chave)<0){
-                    menor = &elementos[j];
-                    posmenor = j;
-                    //cout<<elementos[j].chave<<" "<<menor->chave<<endl;
-                }
-            }
-        }
-
-        // Escreve-o na linha
-        fout<<menor->chave<<","<<menor->valor<<endl;
-
-        // Lê a próxima linha
-        getline(dispositivos[posmenor],buffer);
-        linha = strdup(buffer.c_str());
-        cout<<linha<<endl;
-        if(strlen(linha)==0){
-            hasLine[posmenor] = false;
-        }else{            
-            obterElemento(linha,0,1,*menor);
-        }
-        free(linha);
-        
+    free(menor->chave);
+    free(menor->valor);
+    for(int i=0; i<nDispositivos;i++){
+        dispositivos[i].close();
     }
-    */
-    
-    delete[]maiorValor;
-    
+    delete[]hasLine;
     delete[]dispositivos;
     delete[]elementos;
 }
 
+// Essa função é responsável por calcular a média dos valores que compartilham da mesma chave
 void calculaMedia(ifstream &ordenado){
     
     long double soma=0.0;
@@ -286,6 +246,8 @@ void calculaMedia(ifstream &ordenado){
     // ---------------------------------------------------
     while(getline(ordenado, linha)){        
         linhaChar = (char*)linha.c_str();
+        free(e.chave);
+        free(e.valor);
         obterElemento(linhaChar, 0, 1, e);
         
         if (strcmp(chave, e.chave)==0){
@@ -306,26 +268,43 @@ void calculaMedia(ifstream &ordenado){
     free(e.chave);
     free(e.valor);
     
-//-----------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
 }
 
 
-// Salvar arquivos ordenados
-
 int main(int argc, char **argv){
+
+    //Pega os dados da linha de comando
     char *fileIn = argv[1];
     int n = atoi(argv[2]);
     const char *chave = argv[3];
     const char *valor = argv[4];
+
+    //Abre o arquivo para leitura
     ifstream file(fileIn);
-    ifstream ordenado("ordenado.txt");
+
+    //Define um arquivo para saída dos dados
     ofstream fout("ordenado.txt");
+
     int posChave,posValor;
+
+    //Obtem as posições de chave e valor
     saberQualColunaEstaChaveEValor(file,(char*)chave,(char*)valor,posChave,posValor);
+
+    // Chama a função que ordena em vários arquivos que retorna a quantidade de linhas do arquivo inicial
     int nLinhas = ordenarESepararEmArquivos(file,n,posChave,posValor);
+
+    // Faz o merge dos arquivos ordenados
     ordenacaoExterna(fout,nLinhas,n);
+
+    // Abre o arquivo com os dados ordenados para calcular a média
+    ifstream ordenado("ordenado.txt");
+
+    //Calcula e imprime a média
     calculaMedia(ordenado);
+
+    //Fecha os arquivos
     ordenado.close();
     fout.close();
     file.close();
