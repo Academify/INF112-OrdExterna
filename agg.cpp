@@ -153,14 +153,13 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
     
     int nDispositivos = nLinhasArquivos/n+1;
     string buffer;
-    
     ifstream* dispositivos = new ifstream[nDispositivos];
     Elemento* elementos = new Elemento[nDispositivos];
     char*linha;
     Elemento* menor;
     int posmenor;
-
     int *hasLine = new int[nDispositivos];
+    
     
     // Abre os arquivos e copia para um vetor auxiliar a primeira linha de cada arquivo
     for(int i=0;i<nDispositivos;i++){
@@ -176,10 +175,12 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
         linha = (char *)buffer.c_str();
         obterElemento(linha,0,1,elementos[i]);
     }
+    
     hasLine[nDispositivos-1]=nLinhasArquivos%n;
     menor = &elementos[0];
     posmenor = 0;
 
+    
     for(int i=0;i<nLinhasArquivos;i++){
 
         for(int j=0;j<nDispositivos;j++){
@@ -210,10 +211,9 @@ void ordenacaoExterna(ofstream &fout, int nLinhasArquivos, int n){
         linha = (char *)buffer.c_str();
         obterElemento(linha,0,1,elementos[posmenor]);
         menor = &elementos[posmenor];
-        
     }
-    free(menor->chave);
-    free(menor->valor);
+    
+    
     for(int i=0; i<nDispositivos;i++){
         dispositivos[i].close();
     }
@@ -246,12 +246,11 @@ void calculaMedia(ifstream &ordenado){
     // ---------------------------------------------------
     while(getline(ordenado, linha)){        
         linhaChar = (char*)linha.c_str();
-        free(e.chave);
-        free(e.valor);
         obterElemento(linhaChar, 0, 1, e);
-        
         if (strcmp(chave, e.chave)==0){
             soma +=stold(e.valor);
+            free(chave);
+            free(e.valor);
             chave = e.chave;
             cont++;
         }else{  
@@ -259,14 +258,15 @@ void calculaMedia(ifstream &ordenado){
             cout << fixed << chave << ", " << setprecision(15) << media << endl;
             soma = 0.0;
             soma +=stold(e.valor);
+            free(chave);
+            free(e.valor);
             chave = e.chave;
             cont = 1;
         }
     }
     media = soma/cont;
     cout << fixed << chave << ", " << setprecision(15) << media << endl;
-    free(e.chave);
-    free(e.valor);
+    free(chave);
     
 //---------------------------------------------------------------------------------------------
 
